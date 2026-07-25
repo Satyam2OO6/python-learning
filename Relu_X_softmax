@@ -1,0 +1,54 @@
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.datasets import mnist
+
+# Load MNIST dataset
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+# Normalize pixel values (0-255 -> 0-1)
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+# Create the Neural Network
+model = Sequential([
+    Flatten(input_shape=(28, 28)),      # Convert 28x28 image into 784 values
+
+    Dense(128, activation="relu"),      # Hidden Layer 1
+    Dense(64, activation="relu"),       # Hidden Layer 2
+
+    Dense(10, activation="softmax")     # Output Layer (10 classes)
+])
+
+# Compile the model
+model.compile(
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+# Display model architecture
+model.summary()
+
+# Train the model
+model.fit(
+    X_train,
+    y_train,
+    epochs=5,
+    batch_size=32,
+    validation_split=0.2
+)
+
+# Evaluate the model
+loss, accuracy = model.evaluate(X_test, y_test)
+
+print("\nTest Accuracy:", accuracy)
+
+# Predict first 5 images
+predictions = model.predict(X_test[:5])
+
+print("\nPredicted Classes:")
+print(predictions.argmax(axis=1))
+
+print("\nActual Classes:")
+print(y_test[:5])
